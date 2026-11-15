@@ -128,6 +128,7 @@ nav a:hover{color:var(--txt);background:var(--line)}
 .body p{color:var(--mut);font-size:.93rem;flex:1}
 .open{margin-top:8px;align-self:flex-start;display:inline-flex;gap:8px;align-items:center;font-weight:800;color:var(--c);font-size:.93rem}
 .open:hover{gap:12px}
+.acts{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px}.acts .open{margin-top:0}.gh{font-size:.82rem;font-weight:700;color:var(--mut);padding:5px 12px;border:1px solid var(--line);border-radius:999px}.gh:hover{color:var(--txt);border-color:var(--c)}
 .soon{margin-top:8px;color:var(--mut);font-size:.85rem}
 .empty{text-align:center;color:var(--mut);padding:50px 0;display:none}
 
@@ -291,16 +292,24 @@ const P=[{"t":"اختبارات القانون التجاري","d":"اختبار
 const $=s=>document.querySelector(s);
 const cards=$('#cards'),chips=$('#chips'),q=$('#q'),empty=$('#empty');
 let cur='all';
-function link(p){return p.live||p.repo}
+const SITE='https://alialsaffarmosuluniversity.github.io/';
+const NOAPP=new Set(['goldenMoney','sahhab-android','workflows-starter-template','repofix-mini','llm-compare-bench','rlt-voice-confounds','CASP','ifc-xai-coso','iraq-university-ranking-robustness']);
+function app(p){
+  if(p.live&&!/\/\/github\.com\//.test(p.live))return p.live;
+  const n=p.repo.split('/').pop();
+  if(NOAPP.has(n))return null;
+  return n==='alialsaffarmosuluniversity.github.io'?SITE:SITE+n+'/';
+}
+function link(p){return app(p)||p.repo}
 function render(){
   const term=q.value.trim().toLowerCase();
   const list=P.filter(p=>(cur==='all'||p.cat===cur)&&(!term||(p.t+' '+p.d).toLowerCase().includes(term)));
   cards.innerHTML=list.map(p=>{
     const c=CATS[p.cat],u=link(p);
     return `<article class="card" style="--c:${c.c}">
-      <div class="thumb"><span>${p.i}</span><b class="badge">${p.live?'منشور':'مستودع'}</b></div>
+      <div class="thumb"><span>${p.i}</span><b class="badge">${app(p)?'تطبيق':'مستودع'}</b></div>
       <div class="body"><div class="cat">${c.n}</div><h3>${p.t}</h3><p>${p.d}</p>
-      <a class="open" href="${u}" target="_blank" rel="noopener">${p.live?'فتح التطبيق':'عرض على GitHub'} <span>←</span></a>
+      <div class="acts">${app(p)?`<a class="open" href="${app(p)}" target="_blank" rel="noopener">فتح التطبيق <span>←</span></a>`:''}<a class="gh" href="${p.repo}" target="_blank" rel="noopener">${app(p)?'GitHub':'عرض على GitHub ←'}</a></div>
       </div></article>`}).join('');
   empty.style.display=list.length?'none':'block';
 }
@@ -313,7 +322,7 @@ q.addEventListener('input',render);
 chipsInit();render();
 
 /* stats */
-const web=P.filter(p=>p.live).length;
+const web=P.filter(p=>app(p)).length;
 function count(el,to){let n=0;const step=Math.max(1,Math.ceil(to/40));const t=setInterval(()=>{n=Math.min(to,n+step);el.textContent=n;if(n>=to)clearInterval(t)},30)}
 let counted=false;
 new IntersectionObserver((es,o)=>{if(es[0].isIntersecting&&!counted){counted=true;
