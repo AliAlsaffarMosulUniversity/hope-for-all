@@ -1,0 +1,21 @@
+{
+  "id": "/hope-for-all/",
+  "name": "التكنولوجيا للجميع — مبادرة صُنّاع الأمل",
+  "short_name": "التكنولوجيا للجميع",
+  "description": "معرض للمشاريع البرمجية المجتمعية والتعليمية والإنسانية",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/hope-for-all/",
+  "scope": "/hope-for-all/",
+  "display": "standalone",
+  "background_color": "#07131f",
+  "theme_color": "#07131f",
+  "icons": [
+    {
+      "src": "./app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
