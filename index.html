@@ -294,7 +294,13 @@ const cards=$('#cards'),chips=$('#chips'),q=$('#q'),empty=$('#empty');
 let cur='all';
 const SITE='https://alialsaffarmosuluniversity.github.io/';
 const NOAPP=new Set(['goldenMoney','sahhab-android','workflows-starter-template','repofix-mini','llm-compare-bench','rlt-voice-confounds','CASP','ifc-xai-coso','iraq-university-ranking-robustness']);
+const DLSET=new Set(['Smart-Archive','measures','pagesEVAL']);
+function dl(p){
+  if(p.live&&/\/releases/.test(p.live))return p.live;
+  return DLSET.has(p.repo.split('/').pop())?p.repo+'/releases/latest':null;
+}
 function app(p){
+  if(dl(p))return null;
   if(p.live&&!/\/\/github\.com\//.test(p.live))return p.live;
   const n=p.repo.split('/').pop();
   if(NOAPP.has(n)||STATE[n]===false)return null;
@@ -303,7 +309,7 @@ function app(p){
 /* فحص تلقائي: الصفحات على نفس النطاق، فنعرف أيّها له index فعلاً */
 const STATE={};
 async function probe(){
-  const jobs=P.filter(p=>!(p.live&&!/\/\/github\.com\//.test(p.live))).map(p=>p.repo.split('/').pop())
+  const jobs=P.filter(p=>!dl(p)&&!(p.live&&!/\/\/github\.com\//.test(p.live))).map(p=>p.repo.split('/').pop())
     .filter(n=>!NOAPP.has(n)&&n!=='alialsaffarmosuluniversity.github.io');
   if(location.hostname!=='alialsaffarmosuluniversity.github.io')return;
   await Promise.all([...new Set(jobs)].map(async n=>{
@@ -318,9 +324,9 @@ function render(){
   cards.innerHTML=list.map(p=>{
     const c=CATS[p.cat],u=link(p);
     return `<article class="card" style="--c:${c.c}">
-      <div class="thumb"><span>${p.i}</span><b class="badge">${app(p)?'تطبيق':'مستودع'}</b></div>
+      <div class="thumb"><span>${p.i}</span><b class="badge">${dl(p)?'برنامج':app(p)?'تطبيق':'مستودع'}</b></div>
       <div class="body"><div class="cat">${c.n}</div><h3>${p.t}</h3><p>${p.d}</p>
-      <div class="acts">${app(p)?`<a class="open" href="${app(p)}" target="_blank" rel="noopener">فتح التطبيق <span>←</span></a>`:''}<a class="gh" href="${p.repo}" target="_blank" rel="noopener">${app(p)?'GitHub':'عرض على GitHub ←'}</a></div>
+      <div class="acts">${dl(p)?`<a class="open" href="${dl(p)}" target="_blank" rel="noopener">تحميل البرنامج <span>⬇</span></a>`:app(p)?`<a class="open" href="${app(p)}" target="_blank" rel="noopener">فتح التطبيق <span>←</span></a>`:''}<a class="gh" href="${p.repo}" target="_blank" rel="noopener">${(dl(p)||app(p))?'GitHub':'عرض على GitHub ←'}</a></div>
       </div></article>`}).join('');
   empty.style.display=list.length?'none':'block';
 }
